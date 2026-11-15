@@ -64,6 +64,15 @@ export const MUSCLES = [
     note: 'Muscle profond, recouvert par le frontal et l’orbiculaire de l’œil.',
   },
   {
+    id: 'abaisseur-sourcil', group: 'front',
+    fr: 'Abaisseur du sourcil', la: 'Musculus depressor supercilii',
+    parts: ['depressor supercilii'], aus: ['AU4'],
+    action: 'Tire la tête du sourcil vers le bas, en direction du coin interne de l’œil.',
+    origine: 'Processus frontal du maxillaire, au-dessus du ligament palpébral médial.',
+    insertion: 'Peau de la tête du sourcil.',
+    note: 'Reconstitution schématique : ce muscle manque dans les données anatomiques d’origine. Sa forme a été modélisée d’après sa description, sa position est approximative. Certains auteurs le rattachent à l’orbiculaire de l’œil.',
+  },
+  {
     id: 'procerus', group: 'front',
     fr: 'Procérus', la: 'Musculus procerus',
     parts: ['procerus'], aus: ['AU4'],
@@ -90,6 +99,15 @@ export const MUSCLES = [
     action: 'Tend et rapproche les paupières (AU7), ferme doucement l’œil et assure le clignement.',
     origine: 'Ligament palpébral médial.',
     insertion: 'Raphé palpébral latéral.',
+  },
+  {
+    id: 'releveur-paupiere', group: 'yeux',
+    fr: 'Releveur de la paupière supérieure', la: 'Musculus levator palpebrae superioris',
+    parts: ['levator palpebrae superioris'], aus: ['AU5'],
+    action: 'Soulève la paupière supérieure et découvre le blanc de l’œil au-dessus de l’iris. Son relâchement laisse la paupière retomber.',
+    origine: 'Petite aile du sphénoïde, au fond de l’orbite, au-dessus du canal optique.',
+    insertion: 'Tarse et peau de la paupière supérieure, par une large aponévrose en éventail.',
+    note: 'Muscle logé dans l’orbite, au-dessus du globe oculaire : il est caché par le toit de l’orbite et par l’orbiculaire de l’œil. Dans la peur, le muscle tarsal supérieur (muscle lisse, non représenté) renforce son action.',
   },
   // ── Nez ─────────────────────────────────────────────────────────────
   {
@@ -315,7 +333,7 @@ export const EMOTIONS = [
     resume: 'La tête des sourcils remonte et se rapproche, formant un triangle au-dessus des paupières ; les coins des lèvres tombent. Le menton se fripe souvent (AU17).',
     lignes: [
       { au: 'AU1', muscles: ['frontal'], precision: 'fibres médiales' },
-      { au: 'AU4', muscles: ['corrugateur', 'procerus'], absent: ['Abaisseur du sourcil (depressor supercilii)'] },
+      { au: 'AU4', muscles: ['corrugateur', 'abaisseur-sourcil', 'procerus'] },
       { au: 'AU15', muscles: ['abaisseur-angle'] },
       { au: 'AU17', muscles: ['mentonnier'], precision: 'fréquent' },
     ],
@@ -324,8 +342,8 @@ export const EMOTIONS = [
     id: 'colere', fr: 'Colère', formule: 'AU4 + AU5 + AU7 + AU23',
     resume: 'Les sourcils s’abaissent et se rapprochent, le regard se fixe sous des paupières tendues, les lèvres se serrent et s’amincissent.',
     lignes: [
-      { au: 'AU4', muscles: ['corrugateur', 'procerus'], absent: ['Abaisseur du sourcil (depressor supercilii)'] },
-      { au: 'AU5', muscles: [], absent: ['Releveur de la paupière supérieure (levator palpebrae superioris)'] },
+      { au: 'AU4', muscles: ['corrugateur', 'abaisseur-sourcil', 'procerus'] },
+      { au: 'AU5', muscles: ['releveur-paupiere'] },
       { au: 'AU7', muscles: ['orbiculaire-oeil-palpebrale'] },
       { au: 'AU23', muscles: ['orbiculaire-bouche'] },
       { au: 'AU24', muscles: ['orbiculaire-bouche'], precision: 'fréquent' },
@@ -338,7 +356,7 @@ export const EMOTIONS = [
       { au: 'AU1', muscles: ['frontal'], precision: 'fibres médiales' },
       { au: 'AU2', muscles: ['frontal'], precision: 'fibres latérales' },
       { au: 'AU4', muscles: ['corrugateur'] },
-      { au: 'AU5', muscles: [], absent: ['Releveur de la paupière supérieure (levator palpebrae superioris)'] },
+      { au: 'AU5', muscles: ['releveur-paupiere'] },
       { au: 'AU7', muscles: ['orbiculaire-oeil-palpebrale'] },
       { au: 'AU20', muscles: ['risorius', 'platysma'] },
       { au: 'AU26', muscles: ['masseter', 'temporal', 'pterygoidien-medial'], relache: true },
@@ -350,7 +368,7 @@ export const EMOTIONS = [
     lignes: [
       { au: 'AU1', muscles: ['frontal'], precision: 'fibres médiales' },
       { au: 'AU2', muscles: ['frontal'], precision: 'fibres latérales' },
-      { au: 'AU5', muscles: [], absent: ['Releveur de la paupière supérieure (levator palpebrae superioris)'] },
+      { au: 'AU5', muscles: ['releveur-paupiere'] },
       { au: 'AU26', muscles: ['masseter', 'temporal', 'pterygoidien-medial'], relache: true },
     ],
   },

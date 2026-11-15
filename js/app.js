@@ -218,7 +218,10 @@ function addIrises(root) {
 }
 
 // Muscles profonds, recouverts par d'autres muscles de l'expression
-const DEEP = new Set(['corrugateur', 'releveur-angle', 'buccinateur', 'pterygoidien-medial', 'pterygoidien-lateral']);
+const DEEP = new Set([
+  'corrugateur', 'abaisseur-sourcil', 'releveur-paupiere', 'releveur-angle', 'buccinateur',
+  'pterygoidien-medial', 'pterygoidien-lateral',
+]);
 const GHOST_TINT = new THREE.Color(0x8d7f7b);
 const DIM_TINT = new THREE.Color(0x4a3a38);
 const BLACK = new THREE.Color(0x000000);

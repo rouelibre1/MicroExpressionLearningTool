@@ -1,4 +1,4 @@
-# Identifiant FMA	nom anglais (BodyParts3D 3.0)
+# Identifiant	nom anglais	source (vide = BodyParts3D 3.0, bp3d43 = BodyParts3D 4.3, modele = modélisé par tools/build_model.py)
 FMA46305	anterior belly of left digastric
 FMA46304	anterior belly of right digastric
 FMA46768	aponeurosis of epicranius
@@ -186,3 +186,7 @@ FMA49024	upper head of right lateral pterygoid
 FMA46286	vertical intermediate part of left longus colli
 FMA46285	vertical intermediate part of right longus colli
 FMA9710	vomer
+FJ1306	left levator palpebrae superioris	bp3d43
+FJ1357	right levator palpebrae superioris	bp3d43
+DS-L	left depressor supercilii	modele
+DS-R	right depressor supercilii	modele
