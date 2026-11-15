@@ -7,11 +7,16 @@ CC BY-SA 2.1 Japan :
 - BodyParts3D 4.3, miroir OBJ https://github.com/olivercase/body_parts_3d_api
   pour le releveur de la paupière supérieure, absent de la version 3.0. Les deux
   versions n'ont pas le même repère : ce muscle est recalé sur le globe oculaire.
-L'abaisseur du sourcil n'existe dans aucune des deux versions : il est modélisé
-ici, de façon schématique, sur la surface osseuse du modèle.
+Trois éléments n'existent dans aucune base libre consultée (BodyParts3D 3.0 et
+4.3, Z-Anatomy) et sont construits ici :
+- fibres médiales et latérales du muscle frontal : le maillage réel du muscle
+  est coupé à l'aplomb de la pupille ;
+- muscle tarsal supérieur : nappe modélisée entre deux maillages réels de la
+  version 4.3, la face profonde du releveur et le bord supérieur du tarse ;
+- abaisseur du sourcil : modélisé de façon schématique sur la surface osseuse.
 
 Usage :
-    pip install trimesh fast-simplification numpy
+    pip install trimesh fast-simplification numpy shapely mapbox-earcut networkx
     python3 tools/build_model.py --download   # télécharge les STL puis construit
     python3 tools/build_model.py --stl DIR    # construit depuis des maillages déjà présents
 
@@ -46,8 +51,13 @@ BP3D43_FILES = {
     "FJ1289": "FJ1289_BP23245_FMA58240_Left cornea.obj",
     "FJ1368": "FJ1368_BP23243_FMA58271_Right sclera.obj",
     "FJ1340": "FJ1340_BP23300_FMA58239_Right cornea.obj",
+    # tarses des paupières supérieures : terminaison du muscle tarsal supérieur
+    "FJ1324": "FJ1324_BP23204_FMA59092_Tarsal plate of left upper eyelid.obj",
+    "FJ1375": "FJ1375_BP23231_FMA59091_Tarsal plate of right upper eyelid.obj",
 }
 EYE_REF_43 = {"L": ("FJ1317", "FJ1289"), "R": ("FJ1368", "FJ1340")}
+LEVATOR_43 = {"L": "FJ1306", "R": "FJ1357"}
+TARSUS_43 = {"L": "FJ1324", "R": "FJ1375"}     # tarse de la paupière supérieure
 EYEBALL_30 = "FMA12513"
 # os sur lesquels repose l'abaisseur du sourcil : frontal, maxillaires, os nasaux et lacrymaux
 BROW_BONES = ("FMA52734", "FMA53649", "FMA53650", "FMA53647", "FMA53648", "FMA53645", "FMA53646")
@@ -109,13 +119,113 @@ def load_bp3d43(ident, name, stl_dir):
     """
     side = side_of(name)
     mesh = trimesh.load(os.path.join(stl_dir, ident + ".obj"), force="mesh", process=True)
+    c43, r43, c30, r30 = eye_spheres(side, stl_dir)
+    mesh.vertices = c30 + (np.asarray(mesh.vertices) - c43) * (r30 / r43)
+    print(f"  recalage {side} : échelle {r30 / r43:.3f}, translation {np.round(c30 - c43, 1)} mm",
+          file=sys.stderr)
+    return mesh
+
+
+def eye_spheres(side, stl_dir):
+    """Globe oculaire d'un côté dans les deux versions : centre et rayon 4.3, centre et rayon 3.0."""
     ref = np.vstack([trimesh.load(os.path.join(stl_dir, r + ".obj"), force="mesh").vertices
                      for r in EYE_REF_43[side]])
     c43, r43 = eye_sphere(ref, side)
     c30, r30 = eye_sphere(trimesh.load(os.path.join(stl_dir, EYEBALL_30 + ".stl")).vertices, side)
+    return c43, r43, c30, r30
+
+
+def cut_frontalis(ident, part, stl_dir):
+    """Fibres médiales ou latérales du muscle frontal : coupe du maillage réel du muscle.
+
+    Le frontal est un seul muscle, mais ses fibres médiales (AU 1) et latérales (AU 2) se
+    contractent séparément. Aucune limite anatomique ne les sépare : la coupe est faite par
+    convention à l'aplomb du centre de la pupille, et les deux moitiés sont refermées.
+    """
+    mesh = trimesh.load(os.path.join(stl_dir, ident[:-1] + ".stl"), process=True)
+    # simplifié avant la coupe, pour que les deux moitiés gardent exactement le même bord
+    mesh = simplify(mesh, target_faces(ident, len(mesh.faces)))
+    side = "L" if mesh.centroid[0] > 0 else "R"
+    pupil, _ = eye_sphere(trimesh.load(os.path.join(stl_dir, EYEBALL_30 + ".stl")).vertices, side)
+    outward = 1.0 if side == "L" else -1.0
+    normal = [outward if part == "frontal-lateral" else -outward, 0, 0]
+    half = trimesh.intersections.slice_mesh_plane(
+        mesh, plane_normal=normal, plane_origin=[pupil[0], 0, 0], cap=True)
+    half.metadata["final"] = True
+    return half
+
+
+def model_superior_tarsal(name, stl_dir):
+    """Modélise le muscle tarsal supérieur (muscle de Müller), absent des bases libres.
+
+    Mince nappe de muscle lisse, large d'environ 2 cm et longue d'environ 12 mm, qui naît de
+    la face profonde du releveur de la paupière supérieure et se termine sur le bord supérieur
+    du tarse, plaquée contre le globe. Ses deux attaches sont des maillages réels de
+    BodyParts3D 4.3 ; la nappe tendue entre elles est une reconstitution. Elle est construite
+    dans le repère 4.3 puis recalée sur le globe oculaire du modèle, comme le releveur.
+    """
+    side = side_of(name)
+    c43, r43, c30, r30 = eye_spheres(side, stl_dir)
+
+    def polar(ident):
+        # autour du centre du globe : bêta = écart latéral, alpha = élévation depuis l'avant
+        d = np.asarray(trimesh.load(os.path.join(stl_dir, ident + ".obj"), force="mesh").vertices) - c43
+        rho = np.linalg.norm(d, axis=1)
+        return np.arcsin(d[:, 0] / rho), np.arctan2(d[:, 2], -d[:, 1]), rho
+
+    tb, ta, tr = polar(TARSUS_43[side])
+    lb, la, lr = polar(LEVATOR_43[side])
+    span = np.percentile(tb, [12, 88])          # un peu moins large que le tarse
+    nb, nt = 21, 15
+    beta = np.linspace(span[0], span[1], nb)
+    half = (beta[1] - beta[0]) * 1.5
+    # bord supérieur du tarse, à chaque position latérale
+    a0, r0 = np.zeros(nb), np.zeros(nb)
+    for j, b in enumerate(beta):
+        near = np.abs(tb - b) < half
+        top = near & (ta >= np.percentile(ta[near], 85))
+        a0[j], r0[j] = ta[top].mean(), tr[top].mean()
+    length = 12.0 / r43                         # 12 mm le long du globe, en radians
+    t = np.linspace(0, 1, nt)
+    alpha = a0[None, :] + length * t[:, None]
+    rho = np.zeros((nt, nb))
+    for i in range(nt):
+        for j in range(nb):
+            near = (np.abs(lb - beta[j]) < half) & (np.abs(la - alpha[i, j]) < half)
+            under = lr[near].min() - 0.35 if near.any() else np.inf   # face profonde du releveur
+            ease = t[i] * t[i] * (3 - 2 * t[i])
+            goal = r0[j] + (min(under, r0[j] + 2.5) - r0[j]) * ease
+            rho[i, j] = np.clip(goal, r43 + 0.45, max(under, r43 + 0.45))
+    for _ in range(2):
+        pad = np.pad(rho, 1, mode="edge")
+        rho = (pad[:-2, 1:-1] + pad[2:, 1:-1] + pad[1:-1, :-2] + pad[1:-1, 2:] + 4 * rho) / 8
+    bb = np.broadcast_to(beta[None, :], rho.shape)
+
+    def surface(radius):
+        return c43 + np.dstack([radius * np.sin(bb),
+                                -radius * np.cos(bb) * np.cos(alpha),
+                                radius * np.cos(bb) * np.sin(alpha)]).reshape(-1, 3)
+
+    mesh = slab(surface(rho + 0.35), surface(rho - 0.35), nt, nb)
     mesh.vertices = c30 + (np.asarray(mesh.vertices) - c43) * (r30 / r43)
-    print(f"  recalage {side} : échelle {r30 / r43:.3f}, translation {np.round(c30 - c43, 1)} mm",
-          file=sys.stderr)
+    return mesh
+
+
+def slab(front, back, nt, nu):
+    """Ferme deux grilles de points en regard (nt x nu) en une lame mince."""
+    faces = []
+    n = nt * nu
+    for i in range(nt - 1):
+        for j in range(nu - 1):
+            p, q, r, w = i * nu + j, i * nu + j + 1, (i + 1) * nu + j, (i + 1) * nu + j + 1
+            faces += [[p, q, r], [q, w, r], [n + p, n + r, n + q], [n + q, n + r, n + w]]
+    rim = ([(i, 0) for i in range(nt)] + [(nt - 1, j) for j in range(1, nu)]
+           + [(i, nu - 1) for i in range(nt - 2, -1, -1)] + [(0, j) for j in range(nu - 2, 0, -1)])
+    for (i0, j0), (i1, j1) in zip(rim, rim[1:] + rim[:1]):
+        p, q = i0 * nu + j0, i1 * nu + j1
+        faces += [[p, q, n + p], [q, n + q, n + p]]
+    mesh = trimesh.Trimesh(np.vstack([front, back]), np.array(faces), process=True)
+    mesh.metadata["final"] = True
     return mesh
 
 
@@ -172,24 +282,23 @@ def model_depressor_supercilii(name, stl_dir):
     thick = 1.6 * (1 - 0.6 * u ** 2) * np.clip(np.sin(np.pi * t) * 3, 0.3, 1)
     front = np.dstack([x, bone - lift - thick / 2, z]).reshape(-1, 3)
     back = np.dstack([x, bone - lift + thick / 2, z]).reshape(-1, 3)
-    faces = []
-    n = nt * nu
-    for i in range(nt - 1):
-        for j in range(nu - 1):
-            p, q, r, w = i * nu + j, i * nu + j + 1, (i + 1) * nu + j, (i + 1) * nu + j + 1
-            faces += [[p, q, r], [q, w, r], [n + p, n + r, n + q], [n + q, n + r, n + w]]
-    rim = ([(i, 0) for i in range(nt)] + [(nt - 1, j) for j in range(1, nu)]
-           + [(i, nu - 1) for i in range(nt - 2, -1, -1)] + [(0, j) for j in range(nu - 2, 0, -1)])
-    for (i0, j0), (i1, j1) in zip(rim, rim[1:] + rim[:1]):
-        p, q = i0 * nu + j0, i1 * nu + j1
-        faces += [[p, q, n + p], [q, n + q, n + p]]
-    return trimesh.Trimesh(np.vstack([front, back]), np.array(faces), process=True)
+    return slab(front, back, nt, nu)
 
 
 def target_faces(fma, n_faces):
     if fma == SKIN_ID:
         return 60000
     return int(min(max(n_faces * 0.22, 1200), 9000))
+
+
+def simplify(mesh, target):
+    if len(mesh.faces) <= target:
+        return mesh
+    v, f = fast_simplification.simplify(
+        np.asarray(mesh.vertices, dtype=np.float32),
+        np.asarray(mesh.faces, dtype=np.int32),
+        target_count=target, agg=5)
+    return trimesh.Trimesh(v, f, process=True)
 
 
 def crop_below(mesh, z_min):
@@ -204,6 +313,10 @@ def load_source(ident, name, source, stl_dir):
     """Maillage d'une structure, en millimètres dans le repère de BodyParts3D 3.0."""
     if source == "bp3d43":
         return load_bp3d43(ident, name, stl_dir)
+    if source in ("frontal-medial", "frontal-lateral"):
+        return cut_frontalis(ident, source, stl_dir)
+    if source == "modele" and "tarsal" in name:
+        return model_superior_tarsal(name, stl_dir)
     if source == "modele":
         return model_depressor_supercilii(name, stl_dir)
     return trimesh.load(os.path.join(stl_dir, ident + ".stl"), process=True)  # soude les sommets du STL
@@ -214,14 +327,8 @@ def process(fma, mesh):
         crop_below(mesh, SKIN_Z_MIN)
     elif mesh.bounds[0][2] < CUT_Z_MIN:
         crop_below(mesh, CUT_Z_MIN)
-    n = len(mesh.faces)
-    tgt = target_faces(fma, n)
-    if n > tgt:
-        v, f = fast_simplification.simplify(
-            np.asarray(mesh.vertices, dtype=np.float32),
-            np.asarray(mesh.faces, dtype=np.int32),
-            target_count=tgt, agg=5)
-        mesh = trimesh.Trimesh(v, f, process=True)
+    if not mesh.metadata.get("final"):
+        mesh = simplify(mesh, target_faces(fma, len(mesh.faces)))
     # mm (Z haut, -Y avant) -> cm (Y haut, +Z avant)
     p = (np.asarray(mesh.vertices, dtype=np.float64) - CENTER) * SCALE
     mesh.vertices = np.column_stack([p[:, 0], p[:, 2], -p[:, 1]])

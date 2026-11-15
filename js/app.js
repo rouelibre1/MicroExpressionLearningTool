@@ -143,8 +143,9 @@ function register(mesh) {
   const color = new THREE.Color(spec.color);
   if (info.kind === 'muscle') {
     // légère variation de teinte pour distinguer les muscles voisins
-    const t = hash01(muscle.id);
-    color.offsetHSL((t - 0.5) * 0.035, 0, (hash01(muscle.id + 'l') - 0.5) * 0.09);
+    // `teinte` donne la même couleur aux parties d'un même muscle
+    const seed = muscle.teinte || muscle.id;
+    color.offsetHSL((hash01(seed) - 0.5) * 0.035, 0, (hash01(seed + 'l') - 0.5) * 0.09);
   }
   if (base === 'set of eyebrows') color.set(0x4b3a31);
   mesh.material = new THREE.MeshStandardMaterial({
@@ -219,7 +220,7 @@ function addIrises(root) {
 
 // Muscles profonds, recouverts par d'autres muscles de l'expression
 const DEEP = new Set([
-  'corrugateur', 'abaisseur-sourcil', 'releveur-paupiere', 'releveur-angle', 'buccinateur',
+  'corrugateur', 'abaisseur-sourcil', 'releveur-paupiere', 'muscle-tarsal', 'releveur-angle', 'buccinateur',
   'pterygoidien-medial', 'pterygoidien-lateral',
 ]);
 const GHOST_TINT = new THREE.Color(0x8d7f7b);

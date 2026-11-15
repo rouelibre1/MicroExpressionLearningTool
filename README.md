@@ -38,7 +38,7 @@ statique convient ; avec GitHub Pages : *Settings → Pages → Deploy from a br
 | `js/app.js` | Scène 3D, sélection, étiquettes, interface |
 | `js/data.js` | Muscles, unités d'action, émotions : tout le contenu pédagogique |
 | `js/parts.js` | Table identifiant FMA → nom de la structure (générée) |
-| `assets/head.glb` | Modèle 3D : 191 structures, environ 586 000 triangles, 4 Mo |
+| `assets/head.glb` | Modèle 3D : 195 structures, environ 589 000 triangles, 4 Mo |
 | | Sur un hébergement qui ne sert pas les `.glb`, encoder le fichier en base64 dans un `.txt` et l'indiquer par `data-model="…"` sur le `<canvas id="scene">` |
 | `vendor/three/` | three.js r170 (licence MIT) |
 | `tools/` | Script qui reconstruit le modèle à partir des maillages d'origine |
@@ -63,8 +63,14 @@ statique convient ; avec GitHub Pages : *Settings → Pages → Deploy from a br
   schématique**, modélisée par `tools/build_model.py` sur le rebord médial de l'orbite d'après
   la description anatomique du muscle ; sa forme et sa position sont approximatives, et sa
   fiche le signale.
-- **Muscle tarsal supérieur** (muscle lisse qui renforce l'AU 5 dans la peur) : non représenté.
-- **Muscle frontal** : le modèle n'en sépare pas les fibres médiales (AU 1) et latérales (AU 2).
+- **Muscle tarsal supérieur** (muscle de Müller, renfort involontaire de l'AU 5 dans la peur) :
+  absent de BodyParts3D 3.0 et 4.3 comme de Z-Anatomy. C'est une **reconstitution** : une nappe
+  tendue entre ses deux attaches, qui sont des maillages réels de la version 4.3 (face profonde
+  du releveur de la paupière et bord supérieur du tarse). Sa forme est approximative, et sa
+  fiche le signale.
+- **Muscle frontal** : c'est un seul muscle, que le FACS divise en fibres médiales (AU 1) et
+  latérales (AU 2). Aucune base ne les sépare ; le maillage réel du muscle est coupé en deux
+  par convention à l'aplomb de la pupille.
 - **Correction apportée aux données sources** : BodyParts3D 3.0 intervertit les noms des
   parties orbitaire et palpébrale de l'orbiculaire de l'œil ; `js/data.js` les remet à l'endroit.
 - **Mépris** : l'expression est unilatérale ; le côté gauche du sujet est montré par convention.
@@ -72,7 +78,7 @@ statique convient ; avec GitHub Pages : *Settings → Pages → Deploy from a br
 ## Reconstruire le modèle
 
 ```bash
-pip install trimesh fast-simplification numpy
+pip install trimesh fast-simplification numpy shapely mapbox-earcut networkx
 ```
 
 ```bash

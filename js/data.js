@@ -47,12 +47,22 @@ export const AUS = {
 export const MUSCLES = [
   // ── Front et sourcils ───────────────────────────────────────────────
   {
-    id: 'frontal', group: 'front',
-    fr: 'Muscle frontal', la: 'Venter frontalis musculi occipitofrontalis',
-    parts: ['frontalis'], aus: ['AU1', 'AU2'],
-    action: 'Élève les sourcils et plisse le front en rides horizontales. Ses fibres médiales soulèvent la tête du sourcil (AU1), ses fibres latérales la queue du sourcil (AU2).',
+    id: 'frontal-medial', group: 'front', teinte: 'frontal',
+    fr: 'Muscle frontal, fibres médiales', la: 'Venter frontalis musculi occipitofrontalis, pars medialis',
+    parts: ['medial part of frontalis'], aus: ['AU1'],
+    action: 'Soulève la tête du sourcil et plisse le milieu du front. Contractées seules, ces fibres donnent aux sourcils l’oblique de la tristesse.',
     origine: 'Galéa aponévrotique, à hauteur de la suture coronale.',
-    insertion: 'Peau des sourcils et de la racine du nez.',
+    insertion: 'Peau de la moitié interne du sourcil et de la racine du nez.',
+    note: 'Le muscle frontal est un seul muscle : le FACS distingue ses fibres médiales et latérales parce qu’elles peuvent se contracter séparément. Aucune limite anatomique ne les sépare ; la coupe est tracée ici par convention à l’aplomb de la pupille.',
+  },
+  {
+    id: 'frontal-lateral', group: 'front', teinte: 'frontal',
+    fr: 'Muscle frontal, fibres latérales', la: 'Venter frontalis musculi occipitofrontalis, pars lateralis',
+    parts: ['lateral part of frontalis'], aus: ['AU2'],
+    action: 'Soulève la queue du sourcil et plisse les côtés du front. Avec les fibres médiales, elles haussent tout le sourcil en arc.',
+    origine: 'Galéa aponévrotique, à hauteur de la suture coronale.',
+    insertion: 'Peau de la moitié externe du sourcil.',
+    note: 'Le muscle frontal est un seul muscle : le FACS distingue ses fibres médiales et latérales parce qu’elles peuvent se contracter séparément. Aucune limite anatomique ne les sépare ; la coupe est tracée ici par convention à l’aplomb de la pupille.',
   },
   {
     id: 'corrugateur', group: 'front',
@@ -107,7 +117,16 @@ export const MUSCLES = [
     action: 'Soulève la paupière supérieure et découvre le blanc de l’œil au-dessus de l’iris. Son relâchement laisse la paupière retomber.',
     origine: 'Petite aile du sphénoïde, au fond de l’orbite, au-dessus du canal optique.',
     insertion: 'Tarse et peau de la paupière supérieure, par une large aponévrose en éventail.',
-    note: 'Muscle logé dans l’orbite, au-dessus du globe oculaire : il est caché par le toit de l’orbite et par l’orbiculaire de l’œil. Dans la peur, le muscle tarsal supérieur (muscle lisse, non représenté) renforce son action.',
+    note: 'Muscle logé dans l’orbite, au-dessus du globe oculaire : il est caché par le toit de l’orbite et par l’orbiculaire de l’œil. Dans la peur, le muscle tarsal supérieur renforce son action.',
+  },
+  {
+    id: 'muscle-tarsal', group: 'yeux',
+    fr: 'Muscle tarsal supérieur', la: 'Musculus tarsalis superior',
+    parts: ['superior tarsal muscle'], aus: ['AU5'],
+    action: 'Muscle lisse, involontaire, qui maintient la paupière supérieure ouverte et l’ouvre de un à deux millimètres de plus sous l’effet du système sympathique : il écarquille les yeux dans la peur.',
+    origine: 'Face profonde du releveur de la paupière supérieure.',
+    insertion: 'Bord supérieur du tarse de la paupière supérieure.',
+    note: 'Reconstitution : ce muscle, aussi appelé muscle de Müller, manque dans les données anatomiques libres. La nappe est tendue entre ses deux attaches réelles, le releveur de la paupière et le tarse ; sa forme est approximative. Il est caché sous le releveur.',
   },
   // ── Nez ─────────────────────────────────────────────────────────────
   {
@@ -332,7 +351,7 @@ export const EMOTIONS = [
     id: 'tristesse', fr: 'Tristesse', formule: 'AU1 + AU4 + AU15',
     resume: 'La tête des sourcils remonte et se rapproche, formant un triangle au-dessus des paupières ; les coins des lèvres tombent. Le menton se fripe souvent (AU17).',
     lignes: [
-      { au: 'AU1', muscles: ['frontal'], precision: 'fibres médiales' },
+      { au: 'AU1', muscles: ['frontal-medial'] },
       { au: 'AU4', muscles: ['corrugateur', 'abaisseur-sourcil', 'procerus'] },
       { au: 'AU15', muscles: ['abaisseur-angle'] },
       { au: 'AU17', muscles: ['mentonnier'], precision: 'fréquent' },
@@ -353,10 +372,11 @@ export const EMOTIONS = [
     id: 'peur', fr: 'Peur', formule: 'AU1 + AU2 + AU4 + AU5 + AU7 + AU20 + AU26',
     resume: 'Les sourcils montent tout en se rapprochant, les yeux s’écarquillent sous des paupières inférieures tendues, la bouche s’étire à l’horizontale et la mâchoire se relâche.',
     lignes: [
-      { au: 'AU1', muscles: ['frontal'], precision: 'fibres médiales' },
-      { au: 'AU2', muscles: ['frontal'], precision: 'fibres latérales' },
+      { au: 'AU1', muscles: ['frontal-medial'] },
+      { au: 'AU2', muscles: ['frontal-lateral'] },
       { au: 'AU4', muscles: ['corrugateur'] },
       { au: 'AU5', muscles: ['releveur-paupiere'] },
+      { au: 'AU5', muscles: ['muscle-tarsal'], precision: 'renfort involontaire' },
       { au: 'AU7', muscles: ['orbiculaire-oeil-palpebrale'] },
       { au: 'AU20', muscles: ['risorius', 'platysma'] },
       { au: 'AU26', muscles: ['masseter', 'temporal', 'pterygoidien-medial'], relache: true },
@@ -366,8 +386,8 @@ export const EMOTIONS = [
     id: 'surprise', fr: 'Surprise', formule: 'AU1 + AU2 + AU5 + AU26',
     resume: 'Les sourcils montent d’un bloc en arc, les yeux s’ouvrent grand et la mâchoire tombe, sans tension dans les lèvres. C’est l’expression la plus brève.',
     lignes: [
-      { au: 'AU1', muscles: ['frontal'], precision: 'fibres médiales' },
-      { au: 'AU2', muscles: ['frontal'], precision: 'fibres latérales' },
+      { au: 'AU1', muscles: ['frontal-medial'] },
+      { au: 'AU2', muscles: ['frontal-lateral'] },
       { au: 'AU5', muscles: ['releveur-paupiere'] },
       { au: 'AU26', muscles: ['masseter', 'temporal', 'pterygoidien-medial'], relache: true },
     ],

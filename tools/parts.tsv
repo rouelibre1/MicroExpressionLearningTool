@@ -1,4 +1,4 @@
-# Identifiant	nom anglais	source (vide = BodyParts3D 3.0, bp3d43 = BodyParts3D 4.3, modele = modélisé par tools/build_model.py)
+# Identifiant	nom anglais	source (vide = BodyParts3D 3.0, bp3d43 = BodyParts3D 4.3, modele = modélisé par tools/build_model.py, frontal-medial / frontal-lateral = moitié du muscle frontal de même numéro)
 FMA46305	anterior belly of left digastric
 FMA46304	anterior belly of right digastric
 FMA46768	aponeurosis of epicranius
@@ -33,7 +33,8 @@ FMA46830	left depressor anguli oris
 FMA46818	left depressor labii inferioris
 FMA55609	left depressor septi nasi
 FMA7987	left first rib
-FMA46760	left frontalis
+FMA46760m	medial part of left frontalis	frontal-medial
+FMA46760l	lateral part of left frontalis	frontal-lateral
 FMA46327	left geniohyoid
 FMA54738	left inferior nasal concha
 FMA53646	left lacrimal bone
@@ -110,7 +111,8 @@ FMA46829	right depressor anguli oris
 FMA46817	right depressor labii inferioris
 FMA55608	right depressor septi nasi
 FMA7857	right first rib
-FMA46759	right frontalis
+FMA46759m	medial part of right frontalis	frontal-medial
+FMA46759l	lateral part of right frontalis	frontal-lateral
 FMA46326	right geniohyoid
 FMA54737	right inferior nasal concha
 FMA53645	right lacrimal bone
@@ -190,3 +192,5 @@ FJ1306	left levator palpebrae superioris	bp3d43
 FJ1357	right levator palpebrae superioris	bp3d43
 DS-L	left depressor supercilii	modele
 DS-R	right depressor supercilii	modele
+ST-L	left superior tarsal muscle	modele
+ST-R	right superior tarsal muscle	modele
