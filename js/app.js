@@ -780,6 +780,39 @@ function tick(now) {
 
 // ───────────────────────────── Démarrage ─────────────────────────────
 
+/**
+ * Télécharge le modèle en suivant la progression. Une adresse en « .txt » désigne le même
+ * fichier GLB encodé en base64, pour les hébergements qui ne servent pas les fichiers binaires.
+ */
+async function fetchModel(url, onProgress) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} pour ${url}`);
+  const total = Number(res.headers.get('content-length')) || 0;
+  let bytes;
+  if (res.body && total) {
+    const reader = res.body.getReader();
+    const chunks = [];
+    let loaded = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      loaded += value.length;
+      onProgress(Math.min(loaded / total, 1));
+    }
+    bytes = new Uint8Array(loaded);
+    let offset = 0;
+    for (const c of chunks) { bytes.set(c, offset); offset += c.length; }
+  } else {
+    bytes = new Uint8Array(await res.arrayBuffer());
+  }
+  if (!url.endsWith('.txt')) return bytes.buffer;
+  const bin = atob(new TextDecoder().decode(bytes).trim());
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out.buffer;
+}
+
 function start() {
   buildEmotionBar();
   bindToolbar();
@@ -794,7 +827,14 @@ function start() {
   const loading = $('#loading');
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
-  loader.load('assets/head.glb', (gltf) => {
+  const fail = (err) => {
+    console.error(err);
+    loading.classList.add('is-error');
+    $('#loading-text').textContent = 'Le modèle 3D n’a pas pu être chargé. Rechargez la page ; si le problème persiste, vérifiez que le fichier du modèle est bien publié avec le site.';
+  };
+  fetchModel(canvas.dataset.model || 'assets/head.glb', (k) => {
+    $('#loading-bar').style.width = `${Math.round(k * 100)}%`;
+  }).then((buffer) => loader.parse(buffer, '', (gltf) => {
     gltf.scene.updateMatrixWorld(true);
     gltf.scene.traverse((o) => { if (o.isMesh) register(o); });
     scene.add(gltf.scene);
@@ -806,13 +846,7 @@ function start() {
     if (emotionById.has(initial)) setEmotion(initial, { focus: !reduceMotion.matches });
     else applyState();
     window.__ecorche = { state, entries, select, setEmotion, setView };   // accès pour les tests automatisés
-  }, (ev) => {
-    if (ev.total) $('#loading-bar').style.width = `${Math.round((ev.loaded / ev.total) * 100)}%`;
-  }, (err) => {
-    console.error(err);
-    loading.classList.add('is-error');
-    $('#loading-text').textContent = 'Le modèle 3D n’a pas pu être chargé. Rechargez la page ; si le problème persiste, vérifiez que le fichier assets/head.glb est bien publié avec le site.';
-  });
+  }, fail)).catch(fail);
 }
 
 start();

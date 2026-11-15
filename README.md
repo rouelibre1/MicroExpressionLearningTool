@@ -39,6 +39,7 @@ statique convient ; avec GitHub Pages : *Settings → Pages → Deploy from a br
 | `js/data.js` | Muscles, unités d'action, émotions : tout le contenu pédagogique |
 | `js/parts.js` | Table identifiant FMA → nom de la structure (générée) |
 | `assets/head.glb` | Modèle 3D : 187 structures, environ 580 000 triangles, 4 Mo |
+| | Sur un hébergement qui ne sert pas les `.glb`, encoder le fichier en base64 dans un `.txt` et l'indiquer par `data-model="…"` sur le `<canvas id="scene">` |
 | `vendor/three/` | three.js r170 (licence MIT) |
 | `tools/` | Script qui reconstruit le modèle à partir des maillages d'origine |
 

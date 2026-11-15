@@ -115,7 +115,6 @@ h1 {
   border-radius: 999px;
   background: var(--raised);
   font-weight: 500;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 .emotion:hover { border-color: var(--accent); }
 .emotion[aria-pressed="true"] {
