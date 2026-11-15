@@ -1,0 +1,444 @@
+// Données pédagogiques : muscles, unités d'action (FACS) et émotions.
+// Les muscles sont reliés aux maillages 3D par le nom anglais BodyParts3D
+// de la structure, sans le côté (« right » / « left »).
+
+export const GROUPS = [
+  { id: 'front', fr: 'Front et sourcils' },
+  { id: 'yeux', fr: 'Yeux' },
+  { id: 'nez', fr: 'Nez' },
+  { id: 'bouche', fr: 'Bouche et joues' },
+  { id: 'machoire', fr: 'Mâchoire' },
+  { id: 'cou', fr: 'Cou' },
+  { id: 'crane', fr: 'Cuir chevelu' },
+  { id: 'profond', fr: 'Cou profond et nuque' },
+];
+
+// Unités d'action du Facial Action Coding System (Ekman, Friesen & Hager).
+export const AUS = {
+  AU1: 'Élévation de la partie interne des sourcils',
+  AU2: 'Élévation de la partie externe des sourcils',
+  AU4: 'Abaissement et rapprochement des sourcils',
+  AU5: 'Élévation de la paupière supérieure',
+  AU6: 'Remontée des joues, plis au coin des yeux',
+  AU7: 'Tension des paupières',
+  AU9: 'Plissement du nez',
+  AU10: 'Élévation de la lèvre supérieure',
+  AU11: 'Creusement du sillon nasogénien',
+  AU12: 'Étirement des coins des lèvres vers le haut',
+  AU13: 'Remontée verticale des coins des lèvres',
+  AU14: 'Fossette, pincement du coin des lèvres',
+  AU15: 'Abaissement des coins des lèvres',
+  AU16: 'Abaissement de la lèvre inférieure',
+  AU17: 'Élévation du menton',
+  AU18: 'Lèvres froncées vers l’avant',
+  AU20: 'Étirement horizontal des lèvres',
+  AU21: 'Tension du cou',
+  AU22: 'Lèvres en entonnoir',
+  AU23: 'Lèvres serrées et amincies',
+  AU24: 'Lèvres pressées l’une contre l’autre',
+  AU26: 'Ouverture de la mâchoire par relâchement',
+  AU27: 'Ouverture forcée de la bouche',
+  AU28: 'Lèvres rentrées',
+  AU38: 'Dilatation des narines',
+  AU39: 'Pincement des narines',
+  AU43: 'Fermeture des yeux',
+};
+
+export const MUSCLES = [
+  // ── Front et sourcils ───────────────────────────────────────────────
+  {
+    id: 'frontal', group: 'front',
+    fr: 'Muscle frontal', la: 'Venter frontalis musculi occipitofrontalis',
+    parts: ['frontalis'], aus: ['AU1', 'AU2'],
+    action: 'Élève les sourcils et plisse le front en rides horizontales. Ses fibres médiales soulèvent la tête du sourcil (AU1), ses fibres latérales la queue du sourcil (AU2).',
+    origine: 'Galéa aponévrotique, à hauteur de la suture coronale.',
+    insertion: 'Peau des sourcils et de la racine du nez.',
+  },
+  {
+    id: 'corrugateur', group: 'front',
+    fr: 'Corrugateur du sourcil', la: 'Musculus corrugator supercilii',
+    parts: ['corrugator supercilii'], aus: ['AU4'],
+    action: 'Tire le sourcil vers le bas et vers la ligne médiane ; creuse les rides verticales entre les sourcils (« rides du lion »).',
+    origine: 'Partie médiale de l’arcade sourcilière (os frontal).',
+    insertion: 'Peau de la moitié médiale du sourcil.',
+    note: 'Muscle profond, recouvert par le frontal et l’orbiculaire de l’œil.',
+  },
+  {
+    id: 'procerus', group: 'front',
+    fr: 'Procérus', la: 'Musculus procerus',
+    parts: ['procerus'], aus: ['AU4'],
+    action: 'Abaisse la peau située entre les sourcils et forme un pli horizontal à la racine du nez. Accompagne aussi le plissement du nez (AU9).',
+    origine: 'Os nasal et cartilage latéral du nez.',
+    insertion: 'Peau de la glabelle, entre les sourcils.',
+  },
+  // ── Yeux ────────────────────────────────────────────────────────────
+  {
+    id: 'orbiculaire-oeil-orbitaire', group: 'yeux',
+    fr: 'Orbiculaire de l’œil, partie orbitaire', la: 'Musculus orbicularis oculi, pars orbitalis',
+    // BodyParts3D 3.0 intervertit les deux parties : le maillage nommé « palpebral part »
+    // est le grand anneau qui entoure l'orbite, c'est-à-dire la partie orbitaire.
+    parts: ['palpebral part of orbicularis oculi'], aus: ['AU6'],
+    action: 'Resserre le pourtour de l’orbite : remonte la joue, abaisse légèrement le sourcil et dessine les pattes d’oie. C’est le marqueur du sourire sincère (sourire de Duchenne).',
+    origine: 'Rebord orbitaire médial et ligament palpébral médial.',
+    insertion: 'Fibres circulaires qui reviennent à leur point de départ ; peau de la joue et du sourcil.',
+  },
+  {
+    id: 'orbiculaire-oeil-palpebrale', group: 'yeux',
+    fr: 'Orbiculaire de l’œil, partie palpébrale', la: 'Musculus orbicularis oculi, pars palpebralis',
+    // maillage nommé « orbital part » dans BodyParts3D 3.0 (voir la note ci-dessus)
+    parts: ['orbital part of orbicularis oculi'], aus: ['AU7', 'AU43'],
+    action: 'Tend et rapproche les paupières (AU7), ferme doucement l’œil et assure le clignement.',
+    origine: 'Ligament palpébral médial.',
+    insertion: 'Raphé palpébral latéral.',
+  },
+  // ── Nez ─────────────────────────────────────────────────────────────
+  {
+    id: 'releveur-levre-aile-nez', group: 'nez',
+    fr: 'Releveur de la lèvre supérieure et de l’aile du nez', la: 'Musculus levator labii superioris alaeque nasi',
+    parts: ['levator labii superioris alaeque nasi'], aus: ['AU9'],
+    action: 'Plisse le nez, soulève l’aile du nez et la lèvre supérieure, abaisse la tête du sourcil.',
+    origine: 'Processus frontal du maxillaire.',
+    insertion: 'Cartilage de l’aile du nez et lèvre supérieure.',
+  },
+  {
+    id: 'nasal', group: 'nez',
+    fr: 'Muscle nasal', la: 'Musculus nasalis',
+    parts: ['nasalis'], aus: ['AU38', 'AU39'],
+    action: 'Sa partie alaire dilate la narine (AU38), sa partie transverse la comprime (AU39).',
+    origine: 'Maxillaire, au-dessus des incisives latérales et de la canine.',
+    insertion: 'Aile du nez et dos du nez.',
+  },
+  {
+    id: 'abaisseur-septum', group: 'nez',
+    fr: 'Abaisseur du septum nasal', la: 'Musculus depressor septi nasi',
+    parts: ['depressor septi nasi'], aus: [],
+    action: 'Abaisse la pointe du nez et rétrécit la narine.',
+    origine: 'Maxillaire, au-dessus de l’incisive centrale.',
+    insertion: 'Cloison nasale.',
+  },
+  // ── Bouche et joues ─────────────────────────────────────────────────
+  {
+    id: 'releveur-levre-sup', group: 'bouche',
+    fr: 'Releveur de la lèvre supérieure', la: 'Musculus levator labii superioris',
+    parts: ['levator labii superioris'], aus: ['AU10'],
+    action: 'Soulève la lèvre supérieure et creuse la partie haute du sillon nasogénien.',
+    origine: 'Bord inférieur de l’orbite (maxillaire).',
+    insertion: 'Peau de la lèvre supérieure.',
+  },
+  {
+    id: 'petit-zygomatique', group: 'bouche',
+    fr: 'Petit zygomatique', la: 'Musculus zygomaticus minor',
+    parts: ['zygomaticus minor'], aus: ['AU11'],
+    action: 'Tire la lèvre supérieure en haut et en dehors, accentue le sillon nasogénien.',
+    origine: 'Os zygomatique.',
+    insertion: 'Peau de la lèvre supérieure.',
+  },
+  {
+    id: 'grand-zygomatique', group: 'bouche',
+    fr: 'Grand zygomatique', la: 'Musculus zygomaticus major',
+    parts: ['zygomaticus major'], aus: ['AU12'],
+    action: 'Tire le coin des lèvres en haut et en dehors : c’est le muscle du sourire.',
+    origine: 'Os zygomatique, en avant de la suture zygomatico-temporale.',
+    insertion: 'Modiolus, à l’angle de la bouche.',
+  },
+  {
+    id: 'releveur-angle', group: 'bouche',
+    fr: 'Releveur de l’angle de la bouche', la: 'Musculus levator anguli oris',
+    parts: ['levator anguli oris'], aus: ['AU13'],
+    action: 'Remonte le coin des lèvres presque à la verticale.',
+    origine: 'Fosse canine du maxillaire.',
+    insertion: 'Modiolus, à l’angle de la bouche.',
+    note: 'Muscle profond, situé sous le releveur de la lèvre supérieure et les zygomatiques.',
+  },
+  {
+    id: 'risorius', group: 'bouche',
+    fr: 'Risorius', la: 'Musculus risorius',
+    parts: ['risorius'], aus: ['AU20'],
+    action: 'Tire le coin des lèvres horizontalement vers l’arrière et étire la bouche.',
+    origine: 'Fascia qui recouvre le masséter et la parotide.',
+    insertion: 'Modiolus, à l’angle de la bouche.',
+  },
+  {
+    id: 'buccinateur', group: 'bouche',
+    fr: 'Buccinateur', la: 'Musculus buccinator',
+    parts: ['buccinator'], aus: ['AU14'],
+    action: 'Plaque la joue contre les dents et pince le coin des lèvres en creusant une fossette.',
+    origine: 'Processus alvéolaires du maxillaire et de la mandibule, raphé ptérygo-mandibulaire.',
+    insertion: 'Modiolus et orbiculaire de la bouche.',
+    note: 'Muscle profond de la joue.',
+  },
+  {
+    id: 'orbiculaire-bouche', group: 'bouche',
+    fr: 'Orbiculaire de la bouche', la: 'Musculus orbicularis oris',
+    parts: ['orbicularis oris'], aus: ['AU18', 'AU22', 'AU23', 'AU24', 'AU28'],
+    action: 'Ferme, serre, amincit ou projette les lèvres selon les fibres mises en jeu.',
+    origine: 'Modiolus et fibres des muscles voisins.',
+    insertion: 'Peau et muqueuse des lèvres.',
+  },
+  {
+    id: 'abaisseur-angle', group: 'bouche',
+    fr: 'Abaisseur de l’angle de la bouche', la: 'Musculus depressor anguli oris',
+    parts: ['depressor anguli oris'], aus: ['AU15'],
+    action: 'Tire le coin des lèvres vers le bas.',
+    origine: 'Ligne oblique de la mandibule.',
+    insertion: 'Modiolus, à l’angle de la bouche.',
+  },
+  {
+    id: 'abaisseur-levre-inf', group: 'bouche',
+    fr: 'Abaisseur de la lèvre inférieure', la: 'Musculus depressor labii inferioris',
+    parts: ['depressor labii inferioris'], aus: ['AU16'],
+    action: 'Abaisse la lèvre inférieure et la tire légèrement en dehors, découvrant les dents du bas.',
+    origine: 'Ligne oblique de la mandibule.',
+    insertion: 'Peau de la lèvre inférieure.',
+  },
+  {
+    id: 'mentonnier', group: 'bouche',
+    fr: 'Muscle mentonnier', la: 'Musculus mentalis',
+    parts: ['mentalis'], aus: ['AU17'],
+    action: 'Remonte le menton et pousse la lèvre inférieure vers le haut ; fripe la peau du menton.',
+    origine: 'Fosse incisive de la mandibule.',
+    insertion: 'Peau du menton.',
+  },
+  // ── Mâchoire ────────────────────────────────────────────────────────
+  {
+    id: 'masseter', group: 'machoire',
+    fr: 'Masséter', la: 'Musculus masseter',
+    parts: ['superficial part of masseter', 'deep part of masseter'], aus: ['AU26'],
+    action: 'Ferme la mâchoire avec force. Son relâchement laisse la mandibule s’abaisser (AU26).',
+    origine: 'Arcade zygomatique.',
+    insertion: 'Angle et branche de la mandibule.',
+  },
+  {
+    id: 'temporal', group: 'machoire',
+    fr: 'Muscle temporal', la: 'Musculus temporalis',
+    parts: ['temporalis'], aus: ['AU26'],
+    action: 'Ferme la mâchoire et tire la mandibule en arrière. Se relâche quand la bouche s’ouvre (AU26).',
+    origine: 'Fosse temporale.',
+    insertion: 'Processus coronoïde de la mandibule.',
+  },
+  {
+    id: 'pterygoidien-medial', group: 'machoire',
+    fr: 'Ptérygoïdien médial', la: 'Musculus pterygoideus medialis',
+    parts: ['medial pterygoid'], aus: ['AU26'],
+    action: 'Ferme la mâchoire, avec le masséter. Se relâche quand la bouche s’ouvre (AU26).',
+    origine: 'Fosse ptérygoïde du sphénoïde.',
+    insertion: 'Face médiale de l’angle de la mandibule.',
+    note: 'Muscle profond, caché par la branche de la mandibule.',
+  },
+  {
+    id: 'pterygoidien-lateral', group: 'machoire',
+    fr: 'Ptérygoïdien latéral', la: 'Musculus pterygoideus lateralis',
+    parts: ['upper head of lateral pterygoid', 'lower head of lateral pterygoid'], aus: ['AU27'],
+    action: 'Tire la mandibule en avant et l’abaisse : il ouvre activement la bouche (AU27).',
+    origine: 'Grande aile et lame latérale du processus ptérygoïde du sphénoïde.',
+    insertion: 'Col de la mandibule et disque de l’articulation temporo-mandibulaire.',
+    note: 'Muscle profond, caché par la branche de la mandibule.',
+  },
+  // ── Cou ─────────────────────────────────────────────────────────────
+  {
+    id: 'platysma', group: 'cou',
+    fr: 'Platysma', la: 'Platysma',
+    parts: ['platysma'], aus: ['AU20', 'AU21'],
+    action: 'Tend la peau du cou, tire vers le bas la lèvre inférieure et le coin des lèvres. Il renforce l’étirement de la bouche dans la peur.',
+    origine: 'Fascia qui recouvre le grand pectoral et le deltoïde.',
+    insertion: 'Bord inférieur de la mandibule, peau de la joue et du coin des lèvres.',
+  },
+  {
+    id: 'scm', group: 'cou',
+    fr: 'Sterno-cléido-mastoïdien', la: 'Musculus sternocleidomastoideus',
+    parts: ['sternocleidomastoid'], aus: [],
+    action: 'Tourne la tête du côté opposé et l’incline de son côté ; les deux ensemble fléchissent le cou.',
+    origine: 'Manubrium sternal et tiers médial de la clavicule.',
+    insertion: 'Processus mastoïde de l’os temporal.',
+  },
+  {
+    id: 'digastrique', group: 'cou',
+    fr: 'Digastrique', la: 'Musculus digastricus',
+    parts: ['anterior belly of digastric', 'posterior belly of digastric'], aus: ['AU27'],
+    action: 'Abaisse la mandibule quand l’os hyoïde est fixé : il participe à l’ouverture forcée de la bouche.',
+    origine: 'Incisure mastoïdienne (ventre postérieur) et fosse digastrique de la mandibule (ventre antérieur).',
+    insertion: 'Tendon intermédiaire, relié à l’os hyoïde.',
+  },
+  { id: 'mylohyoidien', group: 'cou', fr: 'Mylo-hyoïdien', la: 'Musculus mylohyoideus', parts: ['mylohyoid'], aus: [], action: 'Forme le plancher de la bouche ; soulève l’os hyoïde et la langue.' },
+  { id: 'geniohyoidien', group: 'cou', fr: 'Génio-hyoïdien', la: 'Musculus geniohyoideus', parts: ['geniohyoid'], aus: [], action: 'Tire l’os hyoïde en avant et en haut ; aide à abaisser la mandibule.' },
+  { id: 'stylohyoidien', group: 'cou', fr: 'Stylo-hyoïdien', la: 'Musculus stylohyoideus', parts: ['stylohyoid'], aus: [], action: 'Tire l’os hyoïde en haut et en arrière.' },
+  { id: 'sternohyoidien', group: 'cou', fr: 'Sterno-hyoïdien', la: 'Musculus sternohyoideus', parts: ['sternohyoid'], aus: [], action: 'Abaisse l’os hyoïde.' },
+  { id: 'omohyoidien', group: 'cou', fr: 'Omo-hyoïdien', la: 'Musculus omohyoideus', parts: ['omohyoid'], aus: [], action: 'Abaisse et fixe l’os hyoïde.' },
+  { id: 'sternothyroidien', group: 'cou', fr: 'Sterno-thyroïdien', la: 'Musculus sternothyroideus', parts: ['sternothyroid'], aus: [], action: 'Abaisse le larynx.' },
+  { id: 'thyrohyoidien', group: 'cou', fr: 'Thyro-hyoïdien', la: 'Musculus thyrohyoideus', parts: ['thyrohyoid'], aus: [], action: 'Rapproche l’os hyoïde et le cartilage thyroïde.' },
+  { id: 'trapeze', group: 'cou', fr: 'Trapèze, partie descendante', la: 'Musculus trapezius, pars descendens', parts: ['descending part of trapezius'], aus: [], action: 'Élève l’épaule et étend la tête.' },
+  // ── Cuir chevelu ────────────────────────────────────────────────────
+  {
+    id: 'occipital', group: 'crane',
+    fr: 'Muscle occipital', la: 'Venter occipitalis musculi occipitofrontalis',
+    parts: ['occipitalis'], aus: [],
+    action: 'Tire le cuir chevelu en arrière et tend la galéa, ce qui donne un appui au muscle frontal.',
+  },
+  {
+    id: 'temporoparietal', group: 'crane',
+    fr: 'Temporo-pariétal', la: 'Musculus temporoparietalis',
+    parts: ['temporoparietalis'], aus: [],
+    action: 'Tend le cuir chevelu au-dessus de l’oreille.',
+  },
+  // ── Cou profond et nuque ────────────────────────────────────────────
+  { id: 'scalene-ant', group: 'profond', fr: 'Scalène antérieur', la: 'Musculus scalenus anterior', parts: ['scalenus anterior'], aus: [], action: 'Fléchit et incline le cou ; élève la première côte.' },
+  { id: 'scalene-moy', group: 'profond', fr: 'Scalène moyen', la: 'Musculus scalenus medius', parts: ['scalenus medius'], aus: [], action: 'Incline le cou ; élève la première côte.' },
+  { id: 'scalene-post', group: 'profond', fr: 'Scalène postérieur', la: 'Musculus scalenus posterior', parts: ['scalenus posterior'], aus: [], action: 'Incline le cou ; élève la deuxième côte.' },
+  { id: 'long-cou', group: 'profond', fr: 'Long du cou', la: 'Musculus longus colli', parts: ['superior oblique part of longus colli', 'vertical intermediate part of longus colli', 'inferior oblique part of longus colli'], aus: [], action: 'Fléchit la colonne cervicale.' },
+  { id: 'long-tete', group: 'profond', fr: 'Long de la tête', la: 'Musculus longus capitis', parts: ['longus capitis'], aus: [], action: 'Fléchit la tête.' },
+  { id: 'droit-ant', group: 'profond', fr: 'Droit antérieur de la tête', la: 'Musculus rectus capitis anterior', parts: ['rectus capitis anterior'], aus: [], action: 'Fléchit la tête sur l’atlas.' },
+  { id: 'droit-lat', group: 'profond', fr: 'Droit latéral de la tête', la: 'Musculus rectus capitis lateralis', parts: ['rectus capitis lateralis'], aus: [], action: 'Incline la tête sur le côté.' },
+  { id: 'droit-post-maj', group: 'profond', fr: 'Grand droit postérieur de la tête', la: 'Musculus rectus capitis posterior major', parts: ['rectus capitis posterior major'], aus: [], action: 'Étend et tourne la tête.' },
+  { id: 'droit-post-min', group: 'profond', fr: 'Petit droit postérieur de la tête', la: 'Musculus rectus capitis posterior minor', parts: ['rectus capitis posterior minor'], aus: [], action: 'Étend la tête.' },
+  { id: 'oblique-sup', group: 'profond', fr: 'Oblique supérieur de la tête', la: 'Musculus obliquus capitis superior', parts: ['obliquus capitis superior'], aus: [], action: 'Étend et incline la tête.' },
+  { id: 'oblique-inf', group: 'profond', fr: 'Oblique inférieur de la tête', la: 'Musculus obliquus capitis inferior', parts: ['obliquus capitis inferior'], aus: [], action: 'Tourne l’atlas, et la tête avec lui.' },
+  { id: 'splenius', group: 'profond', fr: 'Splénius de la tête', la: 'Musculus splenius capitis', parts: ['splenius capitis'], aus: [], action: 'Étend la tête et la tourne de son côté.' },
+  { id: 'semi-epineux', group: 'profond', fr: 'Semi-épineux de la tête', la: 'Musculus semispinalis capitis', parts: ['semispinalis capitis'], aus: [], action: 'Étend la tête.' },
+  { id: 'elevateur-scapula', group: 'profond', fr: 'Élévateur de la scapula', la: 'Musculus levator scapulae', parts: ['levator scapulae'], aus: [], action: 'Élève la scapula ; incline le cou.' },
+];
+
+// Expressions prototypiques des sept émotions universelles (Ekman).
+// Chaque ligne associe une unité d'action aux muscles qui la produisent.
+// `relache: true` : le muscle se relâche au lieu de se contracter.
+// `absent` : muscle en cause mais non représenté dans le modèle 3D.
+export const EMOTIONS = [
+  {
+    id: 'joie', fr: 'Joie', formule: 'AU6 + AU12',
+    resume: 'Les coins des lèvres montent vers les pommettes et les joues se soulèvent. Les pattes d’oie au coin des yeux distinguent le sourire sincère du sourire de politesse.',
+    lignes: [
+      { au: 'AU6', muscles: ['orbiculaire-oeil-orbitaire'] },
+      { au: 'AU12', muscles: ['grand-zygomatique'] },
+    ],
+  },
+  {
+    id: 'tristesse', fr: 'Tristesse', formule: 'AU1 + AU4 + AU15',
+    resume: 'La tête des sourcils remonte et se rapproche, formant un triangle au-dessus des paupières ; les coins des lèvres tombent. Le menton se fripe souvent (AU17).',
+    lignes: [
+      { au: 'AU1', muscles: ['frontal'], precision: 'fibres médiales' },
+      { au: 'AU4', muscles: ['corrugateur', 'procerus'], absent: ['Abaisseur du sourcil (depressor supercilii)'] },
+      { au: 'AU15', muscles: ['abaisseur-angle'] },
+      { au: 'AU17', muscles: ['mentonnier'], precision: 'fréquent' },
+    ],
+  },
+  {
+    id: 'colere', fr: 'Colère', formule: 'AU4 + AU5 + AU7 + AU23',
+    resume: 'Les sourcils s’abaissent et se rapprochent, le regard se fixe sous des paupières tendues, les lèvres se serrent et s’amincissent.',
+    lignes: [
+      { au: 'AU4', muscles: ['corrugateur', 'procerus'], absent: ['Abaisseur du sourcil (depressor supercilii)'] },
+      { au: 'AU5', muscles: [], absent: ['Releveur de la paupière supérieure (levator palpebrae superioris)'] },
+      { au: 'AU7', muscles: ['orbiculaire-oeil-palpebrale'] },
+      { au: 'AU23', muscles: ['orbiculaire-bouche'] },
+      { au: 'AU24', muscles: ['orbiculaire-bouche'], precision: 'fréquent' },
+    ],
+  },
+  {
+    id: 'peur', fr: 'Peur', formule: 'AU1 + AU2 + AU4 + AU5 + AU7 + AU20 + AU26',
+    resume: 'Les sourcils montent tout en se rapprochant, les yeux s’écarquillent sous des paupières inférieures tendues, la bouche s’étire à l’horizontale et la mâchoire se relâche.',
+    lignes: [
+      { au: 'AU1', muscles: ['frontal'], precision: 'fibres médiales' },
+      { au: 'AU2', muscles: ['frontal'], precision: 'fibres latérales' },
+      { au: 'AU4', muscles: ['corrugateur'] },
+      { au: 'AU5', muscles: [], absent: ['Releveur de la paupière supérieure (levator palpebrae superioris)'] },
+      { au: 'AU7', muscles: ['orbiculaire-oeil-palpebrale'] },
+      { au: 'AU20', muscles: ['risorius', 'platysma'] },
+      { au: 'AU26', muscles: ['masseter', 'temporal', 'pterygoidien-medial'], relache: true },
+    ],
+  },
+  {
+    id: 'surprise', fr: 'Surprise', formule: 'AU1 + AU2 + AU5 + AU26',
+    resume: 'Les sourcils montent d’un bloc en arc, les yeux s’ouvrent grand et la mâchoire tombe, sans tension dans les lèvres. C’est l’expression la plus brève.',
+    lignes: [
+      { au: 'AU1', muscles: ['frontal'], precision: 'fibres médiales' },
+      { au: 'AU2', muscles: ['frontal'], precision: 'fibres latérales' },
+      { au: 'AU5', muscles: [], absent: ['Releveur de la paupière supérieure (levator palpebrae superioris)'] },
+      { au: 'AU26', muscles: ['masseter', 'temporal', 'pterygoidien-medial'], relache: true },
+    ],
+  },
+  {
+    id: 'degout', fr: 'Dégoût', formule: 'AU9 + AU15 + AU16',
+    resume: 'Le nez se plisse et la lèvre supérieure remonte, comme pour fermer les narines ; la lèvre inférieure s’abaisse ou est repoussée par le menton.',
+    lignes: [
+      { au: 'AU9', muscles: ['releveur-levre-aile-nez'] },
+      { au: 'AU10', muscles: ['releveur-levre-sup'], precision: 'variante' },
+      { au: 'AU15', muscles: ['abaisseur-angle'] },
+      { au: 'AU16', muscles: ['abaisseur-levre-inf'] },
+      { au: 'AU17', muscles: ['mentonnier'], precision: 'variante' },
+    ],
+  },
+  {
+    id: 'mepris', fr: 'Mépris', formule: 'AU12 + AU14, d’un seul côté',
+    resume: 'Un seul coin de la bouche se serre et remonte légèrement. C’est la seule des sept expressions qui soit asymétrique.',
+    cote: 'L',   // côté gauche du sujet, choisi par convention : l'expression existe des deux côtés
+    lignes: [
+      { au: 'AU12', muscles: ['grand-zygomatique'], precision: 'un seul côté' },
+      { au: 'AU14', muscles: ['buccinateur'], precision: 'un seul côté' },
+    ],
+  },
+];
+
+// Structures qui ne sont pas des muscles : nom français et type d'affichage.
+// Types : os, dent, cartilage, fascia, oeil, levres, gencive, peau, repere.
+const DENTS = {
+  'central secondary incisor tooth': 'Incisive centrale',
+  'lateral secondary incisor tooth': 'Incisive latérale',
+  'secondary canine tooth': 'Canine',
+  'first secondary premolar tooth': 'Première prémolaire',
+  'second secondary premolar tooth': 'Deuxième prémolaire',
+  'first secondary molar tooth': 'Première molaire',
+  'second secondary molar tooth': 'Deuxième molaire',
+};
+
+const STRUCTURES = {
+  'aponeurosis of epicranius': ['Galéa aponévrotique', 'fascia'],
+  'atlas': ['Atlas (C1)', 'os'],
+  'axis': ['Axis (C2)', 'os'],
+  'third cervical vertebra': ['Vertèbre cervicale C3', 'os'],
+  'fourth cervical vertebra': ['Vertèbre cervicale C4', 'os'],
+  'fifth cervical vertebra': ['Vertèbre cervicale C5', 'os'],
+  'sixth cervical vertebra': ['Vertèbre cervicale C6', 'os'],
+  'seventh cervical vertebra': ['Vertèbre cervicale C7', 'os'],
+  'intervertebral disk of axis': ['Disque intervertébral C2-C3', 'cartilage'],
+  'intervertebral disk of third cervical vertebra': ['Disque intervertébral C3-C4', 'cartilage'],
+  'intervertebral disk of fourth cervical vertebra': ['Disque intervertébral C4-C5', 'cartilage'],
+  'intervertebral disk of fifth cervical vertebra': ['Disque intervertébral C5-C6', 'cartilage'],
+  'intervertebral disk of sixth cervical vertebra': ['Disque intervertébral C6-C7', 'cartilage'],
+  'intervertebral disk of seventh cervical vertebra': ['Disque intervertébral C7-T1', 'cartilage'],
+  'clavicle': ['Clavicule', 'os'],
+  'first rib': ['Première côte', 'os'],
+  'manubrium': ['Manubrium sternal', 'os'],
+  'hyoid bone': ['Os hyoïde', 'os'],
+  'mandible': ['Mandibule', 'os'],
+  'maxilla': ['Maxillaire', 'os'],
+  'frontal bone': ['Os frontal', 'os'],
+  'parietal bone': ['Os pariétal', 'os'],
+  'occipital bone': ['Os occipital', 'os'],
+  'temporal bone': ['Os temporal', 'os'],
+  'sphenoid bone': ['Os sphénoïde', 'os'],
+  'ethmoid': ['Os ethmoïde', 'os'],
+  'zygomatic bone': ['Os zygomatique', 'os'],
+  'nasal bone': ['Os nasal', 'os'],
+  'lacrimal bone': ['Os lacrymal', 'os'],
+  'palatine bone': ['Os palatin', 'os'],
+  'vomer': ['Vomer', 'os'],
+  'inferior nasal concha': ['Cornet nasal inférieur', 'os'],
+  'set of nasal cartilages': ['Cartilages du nez', 'cartilage'],
+  'thyroid cartilage': ['Cartilage thyroïde', 'cartilage'],
+  'trachea': ['Trachée', 'cartilage'],
+  'eyeball': ['Globe oculaire', 'oeil'],
+  'gingiva of upper jaw': ['Gencive supérieure', 'gencive'],
+  'gingiva of lower jaw': ['Gencive inférieure', 'gencive'],
+  'labial part of mouth, nsn': ['Lèvres', 'levres'],
+  'ear': ['Pavillon de l’oreille', 'repere'],
+  'set of eyebrows': ['Sourcils', 'repere'],
+  'skin': ['Peau', 'peau'],
+};
+
+/** Nom français et type d'une structure non musculaire, à partir de son nom anglais sans côté. */
+export function structure(base) {
+  if (STRUCTURES[base]) return { fr: STRUCTURES[base][0], kind: STRUCTURES[base][1] };
+  const m = base.match(/^(upper|lower) (.+)$/);
+  if (m && DENTS[m[2]]) {
+    return { fr: `${DENTS[m[2]]} ${m[1] === 'upper' ? 'supérieure' : 'inférieure'}`, kind: 'dent' };
+  }
+  return null;
+}

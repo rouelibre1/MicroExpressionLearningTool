@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- page:start -->
+<title>Écorché des micro-expressions</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,500;0,600;1,400;1,500&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.min.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+<!-- head:end -->
+</head>
+<body>
+<div class="app">
+
+  <main class="stage" id="stage">
+    <canvas id="scene" aria-label="Modèle anatomique 3D de la tête et du cou, peau retirée. Faites glisser pour tourner, cliquez un muscle pour afficher son nom."></canvas>
+    <svg id="leaders" aria-hidden="true"></svg>
+    <div id="labels"></div>
+
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Vues">
+        <button type="button" data-view="face">Face</button>
+        <button type="button" data-view="trois-quarts">Trois-quarts</button>
+        <button type="button" data-view="profil">Profil</button>
+        <button type="button" data-view="dos">Dos</button>
+      </div>
+      <div class="seg" role="group" aria-label="Affichage">
+        <button type="button" data-toggle="skin" title="Superpose la peau en transparence pour situer les muscles sur le visage">Peau</button>
+        <button type="button" data-toggle="bones" title="Affiche le squelette, les dents et les cartilages">Os</button>
+        <button type="button" data-toggle="isolate" title="Rend les autres muscles transparents quand un muscle ou une émotion est en surbrillance">Isoler</button>
+        <button type="button" data-toggle="labels" title="Affiche le nom des muscles en surbrillance, relié à leur position">Étiquettes</button>
+      </div>
+    </div>
+
+    <p class="hint" id="hint">Glisser pour tourner · molette ou pincement pour zoomer · cliquer un muscle pour le nommer</p>
+    <div id="tooltip" class="tooltip" hidden></div>
+
+    <article id="detail" class="detail" hidden>
+      <header class="detail-head">
+        <div class="detail-title">
+          <p id="detail-kind" class="eyebrow"></p>
+          <h2 id="detail-name"></h2>
+          <p id="detail-latin" class="la"></p>
+          <div id="detail-aus" class="chips"></div>
+        </div>
+        <button type="button" id="detail-close" class="icon-btn" aria-label="Fermer la fiche">×</button>
+      </header>
+      <details id="detail-more" open>
+        <summary>Fiche du muscle</summary>
+        <div id="detail-body"></div>
+        <button type="button" id="detail-focus" class="text-btn">Centrer la vue sur ce muscle</button>
+      </details>
+    </article>
+
+    <div id="loading" class="loading">
+      <p id="loading-text">Chargement du modèle anatomique…</p>
+      <div class="loading-track"><div id="loading-bar"></div></div>
+    </div>
+  </main>
+
+  <aside class="panel">
+    <header class="masthead">
+      <p class="eyebrow">Atlas 3D · tête et cou</p>
+      <h1>Écorché des micro-expressions</h1>
+    </header>
+
+    <section class="emotions" aria-labelledby="emotions-title">
+      <h2 id="emotions-title" class="section-title">Les sept émotions universelles</h2>
+      <div id="emotion-bar" class="emotion-bar" role="group" aria-labelledby="emotions-title"></div>
+    </section>
+
+    <div class="panel-scroll">
+      <section id="emotion-card" class="emotion-card" hidden></section>
+
+      <section class="browser" aria-labelledby="browser-title">
+        <h2 id="browser-title" class="section-title">Tous les muscles</h2>
+        <input type="search" id="search" class="search" placeholder="Nom français, latin ou AU 12…" aria-label="Chercher un muscle" autocomplete="off">
+        <div id="muscle-list"></div>
+        <p id="no-result" class="muted" hidden>Aucun muscle ne correspond à cette recherche.</p>
+      </section>
+
+      <footer class="credits">
+        <p>Unités d’action d’après le <em>Facial Action Coding System</em> (Ekman, Friesen et Hager). Les combinaisons indiquées sont les expressions prototypiques ; une micro-expression réelle n’en montre souvent qu’une partie.</p>
+        <p>Modèle 3D : BodyParts3D, © The Database Center for Life Science, licence CC BY-SA 2.1 Japon. Maillages simplifiés pour le web.</p>
+      </footer>
+    </div>
+  </aside>
+
+</div>
+<script type="module" src="js/app.js"></script>
+<!-- page:end -->
+</body>
+</html>
